@@ -59,7 +59,7 @@ class ConfluenceAPI(object):
     ATTACHMENT_METADATA_KEYS = {"id", "type", "version", "title"}
     UPDATE_CONTENT_REQUIRED_KEYS = {"id", "version"}
 
-    def __init__(self, username, password, uri_base, user_agent=DEFAULT_USER_AGENT):
+    def __init__(self, username, password, uri_base, cookie=None, user_agent=DEFAULT_USER_AGENT):
         """
         Initialize the API object.
         :param username: Your Confluence username.
@@ -71,6 +71,7 @@ class ConfluenceAPI(object):
         self.username = username
         self.password = password
         self.uri_base = uri_base if uri_base.endswith('/') else uri_base + "/"
+        self.cookie = cookie
         self.user_agent = user_agent
         self.session = None
 
@@ -110,6 +111,7 @@ class ConfluenceAPI(object):
             self._start_http_session()
         uri = urljoin(self.uri_base, sub_uri)
         if params:
+            kwargs.update({"headers": {"Cookie": self.cookie}})
             kwargs.update(params=params)
         response = self.session.request(request_type, uri, **kwargs)
         response.encoding = 'utf-8'
